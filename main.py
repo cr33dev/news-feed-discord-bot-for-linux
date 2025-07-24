@@ -71,7 +71,7 @@ planet_rss_url = "https://planet.gnu.org/rss20.xml"
 planet_all_feed_list = []
 #debian
 debian_newest_actual = "value"
-debian_rss_url = "https://bits.debian.org/feeds/atom.xml"
+debian_rss_url = "https://bits.debian.org/feeds/feed.rss"
 debian_all_feed_list = []
 #slashdot
 slashdot_newest_actual = "value"
