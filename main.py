@@ -121,8 +121,9 @@ async def main_function(CHANNEL_ID):
             print(arch_all_feed_list[3])
             print(arch_all_feed_list[4])
             print(arch_all_feed_list[5])
-            arch_newest_actual = arch_all_feed_list[0]
             # the next comment
+            arch_newest_actual = arch_all_feed_list[0]
+
         else:
             print("nothing to add")
         response = requests.get(mint_rss_url, headers=headers)
@@ -157,8 +158,9 @@ async def main_function(CHANNEL_ID):
             print(mint_all_feed_list[3])
             print(mint_all_feed_list[4])
             print(mint_all_feed_list[5])
-            mint_newest_actual = mint_all_feed_list[0]
             # the next comment
+            mint_newest_actual = mint_all_feed_list[0]
+
         else:
             print("nothing to add")
         planet_feed = feedparser.parse(planet_rss_url)
@@ -191,8 +193,9 @@ async def main_function(CHANNEL_ID):
             print(planet_all_feed_list[3])
             print(planet_all_feed_list[4])
             print(planet_all_feed_list[5])
-            planet_newest_actual = planet_all_feed_list[0]
             # the next comment
+            planet_newest_actual = planet_all_feed_list[0]
+
         else:
             print("nothing to add")
         response = requests.get(debian_rss_url, headers=headers)
@@ -226,8 +229,9 @@ async def main_function(CHANNEL_ID):
             print(debian_all_feed_list[3])
             print(debian_all_feed_list[4])
             print(debian_all_feed_list[5])
-            debian_newest_actual = debian_all_feed_list[0]
             # the next comment
+            debian_newest_actual = debian_all_feed_list[0]
+
         else:
             print("nothing to add")
         slashdot_feed = feedparser.parse(slashdot_rss_url)
@@ -260,8 +264,9 @@ async def main_function(CHANNEL_ID):
             print(slashdot_all_feed_list[3])
             print(slashdot_all_feed_list[4])
             print(slashdot_all_feed_list[5])
-            slashdot_newest_actual = slashdot_all_feed_list[0]
             # the next comment
+            slashdot_newest_actual = slashdot_all_feed_list[0]
+
         else:
             print("nothing to add")
         lunduke_feed = feedparser.parse(lunduke_rss_url)
@@ -294,8 +299,9 @@ async def main_function(CHANNEL_ID):
             print(lunduke_all_feed_list[3])
             print(lunduke_all_feed_list[4])
             print(lunduke_all_feed_list[5])
-            lunduke_newest_actual = lunduke_all_feed_list[0]
             # the next comment
+            lunduke_newest_actual = lunduke_all_feed_list[0]
+
         else:
             print("nothing to add")
         await asyncio.sleep(1800)
