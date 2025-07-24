@@ -22,6 +22,7 @@
 
 # imports obv
 import discord
+from discord.ext import commands
 import feedparser
 import requests
 import asyncio
@@ -43,6 +44,7 @@ intents = discord.Intents.default()
 intents.guilds = True
 intents.messages = True
 client = discord.Client(intents=intents)
+bot = commands.Bot(command_prefix="!", intents=intents)
 
 # for picky rss requests
 headers = {
@@ -92,16 +94,24 @@ async def main_function(CHANNEL_ID):
         for entry in arch_feed.entries[:6]:
             arch_all_feed_list.append(entry.link)
         arch_latest_potential = arch_all_feed_list[0]
+
+        #make the embed
+
         if arch_latest_potential != arch_newest_actual:
-            await channel.send("Latest Package Updates: Arch-Linux")
-            await channel.send("Newest")
-            await channel.send(arch_all_feed_list[0])
-            await channel.send("Past")
-            await channel.send(arch_all_feed_list[1])
-            await channel.send(arch_all_feed_list[2])
-            await channel.send(arch_all_feed_list[3])
-            await channel.send(arch_all_feed_list[4])
-            await channel.send(arch_all_feed_list[5])
+            title = "Latest Package Updates: Arch-Linux"
+            line1 = "Newest"
+            line3 = "Past"
+            embed_description = "\n".join([line1, arch_all_feed_list[0], line3, arch_all_feed_list[1], arch_all_feed_list[2], arch_all_feed_list[3], arch_all_feed_list[4], arch_all_feed_list[5]])
+            embed = discord.Embed(
+                title=title,
+                color=discord.Color.blue(),
+                description=embed_description
+            )
+
+            # send the embed
+            await channel.send(embed=embed)
+
+            # prints data in terminal ( to disable hash till the next comment)
             print("Latest Package Updates: Arch-Linux")
             print("Newest")
             print(arch_all_feed_list[0])
@@ -112,6 +122,7 @@ async def main_function(CHANNEL_ID):
             print(arch_all_feed_list[4])
             print(arch_all_feed_list[5])
             arch_newest_actual = arch_all_feed_list[0]
+            # the next comment
         else:
             print("nothing to add")
         response = requests.get(mint_rss_url, headers=headers)
@@ -120,15 +131,23 @@ async def main_function(CHANNEL_ID):
             mint_all_feed_list.append(entry.link)
         mint_latest_potential = mint_all_feed_list[0]
         if mint_latest_potential != mint_newest_actual:
-            await channel.send("Latest Package Updates: Linux-Mint")
-            await channel.send("Newest")
-            await channel.send(mint_all_feed_list[0])
-            await channel.send("Past")
-            await channel.send(mint_all_feed_list[1])
-            await channel.send(mint_all_feed_list[2])
-            await channel.send(mint_all_feed_list[3])
-            await channel.send(mint_all_feed_list[4])
-            await channel.send(mint_all_feed_list[5])
+            # make the embed
+
+            title = "Latest Package Updates: Linux-Mint"
+            line1 = "Newest"
+            line3 = "Past"
+            embed_description = "\n".join(
+                [line1, mint_all_feed_list[0], line3, mint_all_feed_list[1], mint_all_feed_list[2],
+                 mint_all_feed_list[3], mint_all_feed_list[4], mint_all_feed_list[5]])
+            embed = discord.Embed(
+                title=title,
+                color=discord.Color.green(),
+                description=embed_description
+            )
+            # send the embed
+            await channel.send(embed=embed)
+
+            # prints data in terminal ( to disable hash till the next comment)
             print("Latest Package Updates: Linux-Mint")
             print("Newest")
             print(mint_all_feed_list[0])
@@ -139,6 +158,7 @@ async def main_function(CHANNEL_ID):
             print(mint_all_feed_list[4])
             print(mint_all_feed_list[5])
             mint_newest_actual = mint_all_feed_list[0]
+            # the next comment
         else:
             print("nothing to add")
         planet_feed = feedparser.parse(planet_rss_url)
@@ -146,15 +166,22 @@ async def main_function(CHANNEL_ID):
             planet_all_feed_list.append(entry.link)
         planet_latest_potential = planet_all_feed_list[0]
         if planet_latest_potential != planet_newest_actual:
-            await channel.send("Latest Package Updates: planet-Linux")
-            await channel.send("Newest")
-            await channel.send(planet_all_feed_list[0])
-            await channel.send("Past")
-            await channel.send(planet_all_feed_list[1])
-            await channel.send(planet_all_feed_list[2])
-            await channel.send(planet_all_feed_list[3])
-            await channel.send(planet_all_feed_list[4])
-            await channel.send(planet_all_feed_list[5])
+            # make the embed
+            title = "Latest Package Updates: planet-Linux"
+            line1 = "Newest"
+            line3 = "Past"
+            embed_description = "\n".join(
+                [line1, planet_all_feed_list[0], line3, planet_all_feed_list[1], planet_all_feed_list[2],
+                 planet_all_feed_list[3], planet_all_feed_list[4], planet_all_feed_list[5]])
+            embed = discord.Embed(
+                title=title,
+                color=discord.Color.purple(),
+                description=embed_description
+            )
+            # send the embed
+            await channel.send(embed=embed)
+
+            # prints data in terminal ( to disable hash till the next comment)
             print("Latest Package Updates: Planet-Linux")
             print("Newest")
             print(planet_all_feed_list[0])
@@ -165,6 +192,7 @@ async def main_function(CHANNEL_ID):
             print(planet_all_feed_list[4])
             print(planet_all_feed_list[5])
             planet_newest_actual = planet_all_feed_list[0]
+            # the next comment
         else:
             print("nothing to add")
         response = requests.get(debian_rss_url, headers=headers)
@@ -173,15 +201,22 @@ async def main_function(CHANNEL_ID):
             debian_all_feed_list.append(entry.link)
         debian_latest_potential = debian_all_feed_list[0]
         if debian_latest_potential != debian_newest_actual:
-            await channel.send("Latest Package Updates: Debian")
-            await channel.send("Newest")
-            await channel.send(debian_all_feed_list[0])
-            await channel.send("Past")
-            await channel.send(debian_all_feed_list[1])
-            await channel.send(debian_all_feed_list[2])
-            await channel.send(debian_all_feed_list[3])
-            await channel.send(debian_all_feed_list[4])
-            await channel.send(debian_all_feed_list[5])
+            # make the embed
+            title = "Latest Package Updates: Debian"
+            line1 = "Newest"
+            line3 = "Past"
+            embed_description = "\n".join(
+                [line1, debian_all_feed_list[0], line3, debian_all_feed_list[1], debian_all_feed_list[2],
+                 debian_all_feed_list[3], debian_all_feed_list[4], debian_all_feed_list[5]])
+            embed = discord.Embed(
+                title=title,
+                color=discord.Color.red(),
+                description=embed_description
+            )
+            # send the embed
+            await channel.send(embed=embed)
+
+            # prints data in terminal ( to disable hash till the next comment)
             print("Latest Package Updates: Debian")
             print("Newest")
             print(debian_all_feed_list[0])
@@ -192,6 +227,7 @@ async def main_function(CHANNEL_ID):
             print(debian_all_feed_list[4])
             print(debian_all_feed_list[5])
             debian_newest_actual = debian_all_feed_list[0]
+            # the next comment
         else:
             print("nothing to add")
         slashdot_feed = feedparser.parse(slashdot_rss_url)
@@ -199,15 +235,22 @@ async def main_function(CHANNEL_ID):
             slashdot_all_feed_list.append(entry.link)
         slashdot_latest_potential = slashdot_all_feed_list[0]
         if slashdot_latest_potential != slashdot_newest_actual:
-            await channel.send("Latest Package Updates: slashdot")
-            await channel.send("Newest")
-            await channel.send(slashdot_all_feed_list[0])
-            await channel.send("Past")
-            await channel.send(slashdot_all_feed_list[1])
-            await channel.send(slashdot_all_feed_list[2])
-            await channel.send(slashdot_all_feed_list[3])
-            await channel.send(slashdot_all_feed_list[4])
-            await channel.send(slashdot_all_feed_list[5])
+            # make the embed
+            title = "Latest Package Updates: slashdot"
+            line1 = "Newest"
+            line3 = "Past"
+            embed_description = "\n".join(
+                [line1, slashdot_all_feed_list[0], line3, slashdot_all_feed_list[1], slashdot_all_feed_list[2],
+                 slashdot_all_feed_list[3], slashdot_all_feed_list[4], slashdot_all_feed_list[5]])
+            embed = discord.Embed(
+                title=title,
+                color=discord.Color.orange(),
+                description=embed_description
+            )
+            # send the embed
+            await channel.send(embed=embed)
+
+            # prints data in terminal ( to disable hash till the next comment)
             print("Latest Package Updates: slashdot")
             print("Newest")
             print(slashdot_all_feed_list[0])
@@ -218,6 +261,7 @@ async def main_function(CHANNEL_ID):
             print(slashdot_all_feed_list[4])
             print(slashdot_all_feed_list[5])
             slashdot_newest_actual = slashdot_all_feed_list[0]
+            # the next comment
         else:
             print("nothing to add")
         lunduke_feed = feedparser.parse(lunduke_rss_url)
@@ -225,15 +269,22 @@ async def main_function(CHANNEL_ID):
             lunduke_all_feed_list.append(entry.link)
         lunduke_latest_potential = lunduke_all_feed_list[0]
         if lunduke_latest_potential != lunduke_newest_actual:
-            await channel.send("Latest Package Updates: lunduke")
-            await channel.send("Newest")
-            await channel.send(lunduke_all_feed_list[0])
-            await channel.send("Past")
-            await channel.send(lunduke_all_feed_list[1])
-            await channel.send(lunduke_all_feed_list[2])
-            await channel.send(lunduke_all_feed_list[3])
-            await channel.send(lunduke_all_feed_list[4])
-            await channel.send(lunduke_all_feed_list[5])
+            # make the embed
+            title = "Latest Package Updates: lunduke"
+            line1 = "Newest"
+            line3 = "Past"
+            embed_description = "\n".join(
+                [line1, lunduke_all_feed_list[0], line3, lunduke_all_feed_list[1], lunduke_all_feed_list[2],
+                 lunduke_all_feed_list[3], lunduke_all_feed_list[4], lunduke_all_feed_list[5]])
+            embed = discord.Embed(
+                title=title,
+                color=discord.Color.dark_gray(),
+                description=embed_description
+            )
+            # send the embed
+            await channel.send(embed=embed)
+
+            # prints data in terminal ( to disable hash till the next comment)
             print("Latest Package Updates: lunduke")
             print("Newest")
             print(lunduke_all_feed_list[0])
@@ -244,12 +295,11 @@ async def main_function(CHANNEL_ID):
             print(lunduke_all_feed_list[4])
             print(lunduke_all_feed_list[5])
             lunduke_newest_actual = lunduke_all_feed_list[0]
+            # the next comment
         else:
             print("nothing to add")
         await asyncio.sleep(1800)
-
 # start when bot ready
-
 @client.event
 async def on_ready():
     print("Logged in")
@@ -262,7 +312,5 @@ async def on_ready():
         await channel.send("Hello! I'm online and ready to go!")
     else:
         print(f"❌ Could not find channel with ID {CHANNEL_ID}")
-
     asyncio.create_task(main_function(CHANNEL_ID))
-
 client.run(TOKEN)
