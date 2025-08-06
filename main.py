@@ -123,3 +123,4 @@ async def on_ready():
         print(f"❌ Could not find channel with ID {CHANNEL_ID}")
     asyncio.create_task(main_function(CHANNEL_ID))
 client.run(TOKEN)
+# this is a comment im adding to make sure i have git setup on my computer
