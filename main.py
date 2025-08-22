@@ -22,6 +22,7 @@ import feedparser
 import requests
 import asyncio
 import re
+from urllib.parse import urlparse
 
 ### USERS WHO MODIFY CODE BEFORE THIS POINT: BEWARE YE ARE ENTERING UNDOCUMENTED TERRITORY ###
 
@@ -32,7 +33,7 @@ CHANNEL_ID = 1408299331228008540
 # options for customization:
 titleOnly = False   # Forces embeds to only show article title (and author/pub date when possible)  (False by default)
 forceList = False   # Forces emebds to always show previous stories instead of content description  (False by default)
-appendList = False  # Forces feeds with valid content descriptions to also display previous stories (False by default)
+appendList = True  # Forces feeds with valid content descriptions to also display previous stories (False by default)
 refreshRate = 1800  # Determines how often the bot checks the feed list. Measured in seconds.       (1800 by default)
 rssUrlList = ["https://archlinux.org/feeds/news/","https://blog.linuxmint.com/?feed=rss2","https://planet.gnu.org/rss20.xml","https://bits.debian.org/feeds/feed.rss","https://rss.slashdot.org/Slashdot/slashdotMain","https://lunduke.substack.com/feed"]
 
@@ -43,7 +44,7 @@ intents = discord.Intents.default()
 intents.guilds = True
 intents.messages = True
 client = discord.Client(intents=intents)
-bot = commands.Bot(command_prefix="!", intents=intents)
+bot = commands.Bot(command_prefix=">", intents=intents)
 # rss browser skin
 headers = {
     "User-Agent": (
@@ -60,15 +61,15 @@ async def main_function(chan_id):
     channel = client.get_channel(chan_id)
     # various variables needed for the previous story list maker
     global rssUrlList, newestValueList, previousArticlesContainer
-    loop_allways_active = True
-    while loop_allways_active:
+    runLoop = True
+    while runLoop:
 
         for i in range(len(rssUrlList)): # loop for going through all RSS feeds
             feedIndex = i
             previousArticlesContainer = [] # reset the temporary feed list
             response = requests.get(rssUrlList[feedIndex], headers=headers)
             temp = feedparser.parse(response.content)
-            # lopp for making previous stories list
+            # loop for making previous stories list
             for entry in temp.entries[:6]:
                 previousArticlesContainer.append("[" + entry.title +"]" + "(" + entry.link + ")")
             if newestValueList[feedIndex] != previousArticlesContainer[0]:
@@ -170,21 +171,59 @@ async def main_function(chan_id):
                 await channel.send(embed=embed)
                 newestValueList[feedIndex] = previousArticlesContainer[0]
             else:
-                print(f"nothing to add for {rssUrlList[feedIndex]}")
+                print(f"\nINFO: No new stories from {rssUrlList[feedIndex]} for this cycle.")
         await asyncio.sleep(refreshRate)
+
 # start bot
 @client.event
 async def on_ready():
-    # print initial information to console
+    # server readout
     print("\nHello there... \n")
-    print("INFO: Logged in")
-    print(f"INFO: User: {client.user}")
-    print(f"INFO: ID: {client.user.id}")
-    print(f"INFO: Channel ID: {client.user.id}\n")
-    if titleOnly:   print("DEBUG: Option 'titleOnly' is enabled: descriptions and images won't be parsed!")
-    if forceList:   print("DEBUG: Option 'forceList' is enabled: descriptions won't be parsed!")
-    if appendList:  print("DEBUG: Option 'appendList' is enabled: 'embedList' will be shown regardless of 'entry.description' contents!")
-    print("DEBUG: Option refreshRate is set to " + str(refreshRate) + ". Bot will scan RSS feeds every " + str(refreshRate / 60) + " minutes!")
+    print("INFO: Logged in!")
+    print(f"INFO: User:         {client.user}")
+    print(f"INFO: User ID:      {client.user.id}")
+    print(f"INFO: Channel ID:   {CHANNEL_ID}")
+    print(f"INFO: Guild ID:     {GUILD}")
+    # feed checker (for role checker, maker)
+    feedHost = ""
+    feedHostList = []
+    print("\nINFO: Parsing feeds into suitable role names...")
+    for j in range(len(rssUrlList)):
+        hostListItem =  urlparse(rssUrlList[j])
+        feedHost = hostListItem.hostname
+        feedHostList.append(feedHost)
+        print("----> Feed '" + str(rssUrlList[j]) + "' shortened to role name '" + str(feedHost) + "'")
+    # role checker
+    serverName = client.get_guild(GUILD)
+    rawServerRoleList = serverName.roles
+    roleNameList = []
+    roleName = ""
+    print("\nINFO: Reading roles from server...")
+    for k in range(len(rawServerRoleList)):
+        roleName = rawServerRoleList[k].name
+        roleNameList.append(roleName)
+        print("----> Role '" + str(roleName) + "' was discovered")
+    # role maker
+    print("\nINFO: Adding missing subscription roles to server...")
+    rolesNotToMakeSet = set(feedHostList) & set(roleNameList)
+    rolesNotToMakeList = list(rolesNotToMakeSet)
+    rolesToMakeSet = set(feedHostList) - set(roleNameList)
+    rolesToMakeList = list(rolesToMakeSet)
+    for m in range(len(rolesNotToMakeList)):
+        roleNotToMake = rolesNotToMakeList[m]
+        print("----> Role '" + str(roleNotToMake) + "` already exists in the server; skipping...")
+    for l in range(len(rolesToMakeList)):
+        roleToMake = rolesToMakeList[l]
+        await serverName.create_role(name=str(roleToMake), mentionable=True)
+        print("----> Role '" + str(roleToMake) + "' doesn't exist in the server; adding...'")
+    # options readout
+    if titleOnly:   print("INFO: Option 'titleOnly' is enabled: descriptions and images won't be parsed.")
+    else:           print("INFO: Option 'titleOnly' is disabled: descriptions and images will be parsed.")
+    if forceList:   print("INFO: Option 'forceList' is enabled: descriptions won't be parsed.")
+    else:           print("INFO: Option 'forceList' is disabled: descriptions will be parsed.")
+    if appendList:  print("INFO: Option 'appendList' is enabled: 'embedList' will be shown regardless of 'entry.description' contents.")
+    else:           print("INFO: Option 'appendList' is disabled: 'embedList' will only be shown if parsed description data from rss feed is faulty.")
+    print("DEBUG: Option refreshRate is set to " + str(refreshRate) + ". Bot will scan RSS feeds every " + str(refreshRate / 60) + " minutes.")
     print("\nThere are " + str(len(rssUrlList)) + " entries in rssUrlList.")
     print("Raw contents of rssUrlList is \n" + str(rssUrlList))
     print("\nFEED DEBUG DATA: TITLE, LINK, AUTHOR, PUBLISHED, IMAGE, DESCRIPTION:")
@@ -200,6 +239,10 @@ async def on_ready():
             )
         await channel.send("There are " + str(len(rssUrlList)) + " entries in `rssUrlList`")
         await channel.send("Raw contents of `rssUrlList` is:\n`" + str(rssUrlList) + "`")
+        for n in range(len(rolesNotToMakeList)):
+            await channel.send("The `" + str(rolesNotToMakeList[n] + "` role already existed in the server."))
+        for o in range(len(rolesToMakeList)):
+            await channel.send("The `" + str(rolesToMakeList[o]) + "` role was created in the server.")
     else:
         print(f"DEBUG: Could not find channel with ID {CHANNEL_ID}")
     asyncio.create_task(main_function(CHANNEL_ID))
