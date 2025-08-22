@@ -26,9 +26,9 @@ import re
 ### USERS WHO MODIFY CODE BEFORE THIS POINT: BEWARE YE ARE ENTERING UNDOCUMENTED TERRITORY ###
 
 # discord bot token, server ID, and channel ID
-TOKEN = ''
-GUILD =
-CHANNEL_ID =
+TOKEN = 'MTQwODMwNzk3MTA2MjEwODI0MQ.GgrArS.1QvTGQE1jNKfhCAZKtj8DWh5TaCZzhBAwymDUY'
+GUILD = 1408299232456085504
+CHANNEL_ID = 1408299331228008540
 # options for customization:
 titleOnly = False   # Forces embeds to only show article title (and author/pub date when possible)  (False by default)
 forceList = False   # Forces emebds to always show previous stories instead of content description  (False by default)
@@ -62,6 +62,7 @@ async def main_function(chan_id):
     global rssUrlList, newestValueList, previousArticlesContainer
     loop_allways_active = True
     while loop_allways_active:
+
         for i in range(len(rssUrlList)): # loop for going through all RSS feeds
             feedIndex = i
             previousArticlesContainer = [] # reset the temporary feed list
@@ -78,6 +79,7 @@ async def main_function(chan_id):
                          previousArticlesContainer[3],
                         ]
                 )
+
                 # parse feed elements to variables usable by discord.Embed
                 embedImage = ""
                 embedAuthor = ""
@@ -88,19 +90,17 @@ async def main_function(chan_id):
                 # name and assign guaranteed elements
                 print(str(entry.title) + "\n" + str(entry.link))
                 # check for author
-                try:
-                    if "author" in entry:
-                        embedAuthor = str(entry.author)
-                        print(str(entry.author))
-                except:
+                if "author" in entry:
+                    embedAuthor = str(entry.author)
+                    print(str(entry.author))
+                else:
                     embedAuthor = ""
                     print("This feed has no author data!")
                 # check for publish by date
-                try:
-                    if "published" in entry:
-                        embedPub = str(entry.published)
-                        print(str(entry.published))
-                except:
+                if "published" in entry:
+                    embedPub = str(entry.published)
+                    print(str(entry.published))
+                else:
                     embedPub = ""
                     print("This feed has no 'published by' date data!")
                 # check user configuration, check for image and description, assign variables accordingly
