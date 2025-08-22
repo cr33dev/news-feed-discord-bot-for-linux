@@ -28,6 +28,10 @@ explanation:
     * Default state: 1800
     * Function: The amount of time, measured in seconds, that the bot
     waits before checking the rss feeds for new articles.
+* rssUrlList
+    * Type: List
+    * Default state: Empty
+    * Contains each rss feed URL the bot will scrape
 
 ## To-do List
 * Add feed-specific subscription feature.
