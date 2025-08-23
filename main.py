@@ -186,6 +186,7 @@ async def main_function(chan_id):
                         await interaction.response.defer()
 #                        await interaction.response.edit_message(view=Unsubbed())
                 # ping subscriber, send embed, send buttons, reset previous stories counter.
+                await channel.send(assignRole.mention)
                 await channel.send(embed=embed, view=Sub())
                 newestValueList[feedIndex] = previousArticlesContainer[0]
             else:
