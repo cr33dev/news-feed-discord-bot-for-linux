@@ -43,3 +43,7 @@ explanation:
     * Adds them to a different role according to each link.
     * Link to role relationship is determined by head of main.py
     configuration like with existing options.
+
+## Known Bugs
+* All 'Subscribe' and 'Unsubscribe' buttons only modify the role of the
+    most recent embeds feed.
