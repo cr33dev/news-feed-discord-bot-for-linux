@@ -27,9 +27,9 @@ from urllib.parse import urlparse
 ### USERS WHO MODIFY CODE BEFORE THIS POINT: BEWARE YE ARE ENTERING UNDOCUMENTED TERRITORY ###
 
 # discord bot token, server ID, and channel ID
-TOKEN = 'MTQwODMwNzk3MTA2MjEwODI0MQ.GgrArS.1QvTGQE1jNKfhCAZKtj8DWh5TaCZzhBAwymDUY'
-GUILD = 1408299232456085504
-CHANNEL_ID = 1408299331228008540
+TOKEN = ''
+GUILD =
+CHANNEL_ID =
 # options for customization:
 titleOnly = False   # Forces embeds to only show article title (and author/pub date when possible)  (False by default)
 forceList = False   # Forces emebds to always show previous stories instead of content description  (False by default)
@@ -53,7 +53,6 @@ headers = {
         "Chrome/115.0.0.0 Safari/537.36"
     )
 }
-
 # what does this even do? - seafer6969
 newestValueList = ["value","value","value","value","value","value"]
 # main
@@ -63,7 +62,6 @@ async def main_function(chan_id):
     global rssUrlList, newestValueList, previousArticlesContainer
     runLoop = True
     while runLoop:
-
         for i in range(len(rssUrlList)): # loop for going through all RSS feeds
             feedIndex = i
             previousArticlesContainer = [] # reset the temporary feed list
@@ -80,13 +78,7 @@ async def main_function(chan_id):
                          previousArticlesContainer[3],
                         ]
                 )
-
                 # parse feed elements to variables usable by discord.Embed
-                embedImage = ""
-                embedAuthor = ""
-                embedPub = ""
-                embedFValue = ""
-                embedFName = ""
                 embedDesc = ""
                 # name and assign guaranteed elements
                 print(str(entry.title) + "\n" + str(entry.link))
@@ -152,6 +144,7 @@ async def main_function(chan_id):
                     embedFValue = ""
                     embedDesc = ""
                     print("DEBUG: titleOnly enabled: skipping image and description.\n")
+
                 # add default elements
                 embed = discord.Embed(
                     # Universal guaranteed elements: title, link, color (from discord)
@@ -163,12 +156,37 @@ async def main_function(chan_id):
                 )
                 # add default elements that require external declaration to discord.Embed()
                 embed.set_author(name = embedAuthor)
-                embed.set_footer(text = embedPub )
+                embed.set_footer(text = embedPub)
                 # add user configured elements: image (titleOnly), text vs list (forceList, appendList)
                 embed.set_image(url = embedImage)
                 embed.add_field(name = embedFName, value = embedFValue)
-                # send message, reset previous stories counter.
-                await channel.send(embed=embed)
+                # identify the role for the buttons
+                currentRole = feedHostList[i]
+                guild = client.guilds[0]
+                assignRole = discord.utils.get(guild.roles,name=currentRole)
+                # this is supposed to be for changing the buttons after they're pressed: doesn't work.
+#                class Subbed(discord.ui.View):
+#                    @discord.ui.button(label="Subscribed", style=discord.ButtonStyle.green)
+#                    async def clickedSubscribe(self, button: discord.ui.Button):
+#                        button.disabled = True
+#                class Unsubbed(discord.ui.View):
+#                    @discord.ui.button(label="Unsubscribed", style=discord.ButtonStyle.red)
+#                    async def clickedUnsubscribe(self, button: discord.ui.Button):
+#                        button.disabled = True
+                # make the buttons
+                class Sub(discord.ui.View):
+                    @discord.ui.button(label="Subscribe", style=discord.ButtonStyle.green)
+                    async def clickSubscribe(self, interaction: discord.Interaction, button: discord.ui.Button):
+                        await interaction.user.add_roles(assignRole)
+                        await interaction.response.defer()
+#                        await interaction.response.edit_message(view=Subbed())
+                    @discord.ui.button(label="Unsubscribe", style=discord.ButtonStyle.red)
+                    async def clickUnsubscribe(self, interaction: discord.Interaction, button: discord.ui.Button):
+                        await interaction.user.remove_roles(assignRole)
+                        await interaction.response.defer()
+#                        await interaction.response.edit_message(view=Unsubbed())
+                # ping subscriber, send embed, send buttons, reset previous stories counter.
+                await channel.send(embed=embed, view=Sub())
                 newestValueList[feedIndex] = previousArticlesContainer[0]
             else:
                 print(f"\nINFO: No new stories from {rssUrlList[feedIndex]} for this cycle.")
@@ -186,6 +204,7 @@ async def on_ready():
     print(f"INFO: Guild ID:     {GUILD}")
     # feed checker (for role checker, maker)
     feedHost = ""
+    global feedHostList #global for access in subscribtion function
     feedHostList = []
     print("\nINFO: Parsing feeds into suitable role names...")
     for j in range(len(rssUrlList)):
@@ -195,14 +214,17 @@ async def on_ready():
         print("----> Feed '" + str(rssUrlList[j]) + "' shortened to role name '" + str(feedHost) + "'")
     # role checker
     serverName = client.get_guild(GUILD)
+    global rawServerRoleList #this is global for an experiment HEY MAYBE UNGLOBALIZE THIS IF YOU DONT NEED IT
     rawServerRoleList = serverName.roles
     roleNameList = []
-    roleName = ""
+    roleIDList = []
     print("\nINFO: Reading roles from server...")
     for k in range(len(rawServerRoleList)):
         roleName = rawServerRoleList[k].name
+        roleID = rawServerRoleList[k].id
         roleNameList.append(roleName)
-        print("----> Role '" + str(roleName) + "' was discovered")
+        roleIDList.append(roleID)
+        print("----> Role '" + str(roleName) + "' was discovered with ID: " + str(roleID) + ".")
     # role maker
     print("\nINFO: Adding missing subscription roles to server...")
     rolesNotToMakeSet = set(feedHostList) & set(roleNameList)
@@ -223,9 +245,9 @@ async def on_ready():
     else:           print("INFO: Option 'forceList' is disabled: descriptions will be parsed.")
     if appendList:  print("INFO: Option 'appendList' is enabled: 'embedList' will be shown regardless of 'entry.description' contents.")
     else:           print("INFO: Option 'appendList' is disabled: 'embedList' will only be shown if parsed description data from rss feed is faulty.")
-    print("DEBUG: Option refreshRate is set to " + str(refreshRate) + ". Bot will scan RSS feeds every " + str(refreshRate / 60) + " minutes.")
-    print("\nThere are " + str(len(rssUrlList)) + " entries in rssUrlList.")
-    print("Raw contents of rssUrlList is \n" + str(rssUrlList))
+    print("INFO: Option refreshRate is set to " + str(refreshRate) + ". Bot will scan RSS feeds every " + str(refreshRate / 60) + " minutes.")
+    print("INFO: There are " + str(len(rssUrlList)) + " entries in rssUrlList.")
+    print("INFO: Raw contents of rssUrlList is \n" + str(rssUrlList))
     print("\nFEED DEBUG DATA: TITLE, LINK, AUTHOR, PUBLISHED, IMAGE, DESCRIPTION:")
     # print intial information to discord channel
     channel = client.get_channel(CHANNEL_ID)
